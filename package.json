@@ -1,10 +1,16 @@
 {
   "name": "igme.430-project1",
   "version": "1.0.0",
+  "engines": {
+    "node": "v14.9.0",
+    "npm": "6.14.8"
+  },
   "description": "The first project for Rich Media II",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Test complete\""
   },
   "repository": {
     "type": "git",
@@ -15,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/amf7619/IGME.430-Project1/issues"
   },
-  "homepage": "https://github.com/amf7619/IGME.430-Project1#readme"
+  "homepage": "https://github.com/amf7619/IGME.430-Project1#readme",
+  "devDependencies": {
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.22.0"
+  }
 }

@@ -7,24 +7,31 @@ const jsonHandler = require('./jsonResponses.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
-    const body = [];
+  const body = [];
 
-    request.on('error', (err) => {
-      console.dir(err);
-      response.statusCode = 400;
-      response.end();
-    });
+  request.on('error', (err) => {
+    console.dir(err);
+    response.statusCode = 400;
+    response.end();
+  });
 
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
+  request.on('data', (chunk) => {
+    body.push(chunk);
+  });
 
+  if (parsedUrl.pathname === '/addBoard') {
     request.on('end', () => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
 
-      jsonHandler.addUser(request, response, bodyParams);
+      jsonHandler.addBoard(request, response, bodyParams);
+    });
+  } else if (parsedUrl.pathname === '/updateBoard') {
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+
+      jsonHandler.updateBoard(request, response, bodyParams);
     });
   }
 };
@@ -33,12 +40,13 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
-    '/getUsers': jsonHandler.getUsers,
-    '/updateUser': jsonHandler.updateUser,
+    '/getBoard': jsonHandler.getBoard,
+    '/getBoardList': jsonHandler.getBoardList,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
-    '/getUsers': jsonHandler.getUsersMeta,
+    '/getBoard': jsonHandler.getBoardMeta,
+    '/getBoardList': jsonHandler.getBoardListMeta,
     notFound: jsonHandler.notFoundMeta,
   },
 };

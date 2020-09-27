@@ -7,6 +7,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
+        let currentColor = "#ffffff";
+
         const parseJSON = (xhr, content) => {
             if (xhr.response && xhr.getResponseHeader('Content-Type') == 'application/json') {
                 const obj = JSON.parse(xhr.response);
@@ -48,35 +50,36 @@
             parseJSON(xhr, content);
         }
 
+        const createXMLRequest = (form) => {
+            const url = form.getAttribute('action');
+            const method = form.getAttribute('method');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url);
+
+            return xhr;
+        }
+
         const sendPost = (e, nameForm) => {
             e.preventDefault();
 
-            const nameAction = nameForm.getAttribute('action');
-            const nameMethod = nameForm.getAttribute('method');
+            const xhr = createXMLRequest(nameForm);
 
             const nameField = nameForm.querySelector('#nameField');
-            const ageField = nameForm.querySelector('#ageField');
-
-            const xhr = new XMLHttpRequest();
-            xhr.open(nameMethod, nameAction);
 
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             xhr.onload = () => handleResponse(xhr);
 
-            const formData = `name=${nameField.value}&age=${ageField.value}`;
+            const formData = `name=${nameField.value}`;
             xhr.send(formData);
 
             return false;
         };
 
         const requestUpdate = (e, userForm) => {
-            const url = userForm.querySelector('#urlField').value;
-            const method = userForm.querySelector('#methodSelect').value;
-
-            const xhr = new XMLHttpRequest();
-            xhr.open(method, url);
+            const xhr = createXMLRequest(userForm);
 
             xhr.setRequestHeader('Accept', 'application/json');
 
@@ -92,9 +95,19 @@
             return false;
         };
 
+        const pickColor = (color) => {
+            currentColor = color;
+            console.log(currentColor);
+        }
+
         const init = () => {
             const userForm = document.querySelector('#userForm');
             const nameForm = document.querySelector('#nameForm');
+
+            const colorPickerList = document.getElementsByClassName("colorPicker");
+            for(let i = 0; i < colorPickerList.length; i++) {
+                colorPickerList[i].onclick = pickColor(colorPickerList[i].value);
+            }
 
             const getUsers = (e) => requestUpdate(e, userForm);
             const addUser = (e) => sendPost(e, nameForm);
@@ -109,27 +122,65 @@
 
 <body>
     <section id="top">
-        <h3>POST Status Code Tests</h3>
-        <form id="nameForm" action="/addUser" method="post">
-            <label for="name">Name: </label>
-            <input id="nameField" type="text" name="name" />
-            <label for="age">Age: </label>
-            <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
-            <input type="submit" value="Add User" />
+        <h3>Color Chart</h3>
+        <form id="nameForm" action="/addBoard" method="post">
+            <input id="nameField" type="text" name="name" placeholder="Board Name"/>
+            <input type="submit" value="Create New Board"/>
         </form>
-        <form id="userForm" action="/getUsers" method="get">
-            <select id='urlField'>
-                <option value='/getUsers'>/getUsers</option>
-                <option value='/notReal'>/notReal</option>
-            </select>
-            <select id="methodSelect">
-                <option value="get">GET</option>
-                <option value="head">HEAD</option>
-            </select>
-            <input type="submit" value="Get User" />
+        <form id="userForm" action="/getBoardList" method="get">
+            <input type="submit" value="Get All Boards"/>
         </form>
     </section>
     <section id="content">
+    </section>
+    <section id="board">
+        <div id="boardRow">
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+        </div>
+        <div id="boardRow">
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+        </div>
+        <div id="boardRow">
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+        </div>
+        <div id="boardRow">
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+        </div>
+        <div id="boardRow">
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+            <button class="boardButton" value="#ffffff"></button>
+        </div>
+    </section>
+    <section id="bottom">
+        <h3>Pick a color</h3>
+        <button class="colorPicker" id="whiteButton" value="#ffffff"></button>
+        <button class="colorPicker" id="redButton" value="#ff0000"></button>
+        <button class="colorPicker" id="orangeButton" value="#ff9933"></button>
+        <button class="colorPicker" id="yellowButton" value="#ffff00"></button>
+        <button class="colorPicker" id="greenButton" value="#00ff00"></button>
+        <button class="colorPicker" id="cyanButton" value="#00ffff"></button>
+        <button class="colorPicker" id="blueButton" value="#0000ff"></button>
+        <button class="colorPicker" id="purpleButton" value="#ff00ff"></button>
+        <button class="colorPicker" id="blackButton" value="#000000"></button>
     </section>
 </body>
 
