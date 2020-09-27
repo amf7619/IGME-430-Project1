@@ -64,23 +64,23 @@ const getBoardList = (request, response) => {
 
 const getBoardListMeta = (request, response) => { respondJSONMeta(request, response, 200); };
 
-const getBoard = (request, response, body) => {
+const getBoard = (request, response, params) => {
   const responseJSON = {
     message: 'The name of the board is required to retrieve',
   };
 
-  if (!body.name) {
+  if (!params.name) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
-  if (!boards[body.name]) {
+  if (!boards[params.name]) {
     responseJSON.message = 'A board with that name does not exist';
     responseJSON.id = 'incorrectName';
     return respondJSON(request, response, 400, responseJSON);
   }
 
-  responseJSON.board = boards[body.name];
+  responseJSON.board = boards[params.name];
 
   responseJSON.message = 'Board retrieved!';
   return respondJSON(request, response, 200, responseJSON);

@@ -7,8 +7,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
-        let currentColor = "#ffffff";
-
+        const boardButtons = [];
+        
         const parseJSON = (xhr, content) => {
             if (xhr.response && xhr.getResponseHeader('Content-Type') == 'application/json') {
                 const obj = JSON.parse(xhr.response);
@@ -19,6 +19,13 @@
                 }
                 else {
                     content.innerHTML += `<p>${xhr.response}</p>`;
+                }
+
+                if(obj.board) {
+                    for(let i = 0; i < obj.board.length; i++) {
+                        boardButtons[i].value = obj.board[i];
+                        boardButtons[i].style.backgroundColor = obj.board[i];
+                    }
                 }
             }
         }
@@ -95,19 +102,11 @@
             return false;
         };
 
-        const pickColor = (color) => {
-            currentColor = color;
-            console.log(currentColor);
-        }
-
         const init = () => {
             const userForm = document.querySelector('#userForm');
             const nameForm = document.querySelector('#nameForm');
 
-            const colorPickerList = document.getElementsByClassName("colorPicker");
-            for(let i = 0; i < colorPickerList.length; i++) {
-                colorPickerList[i].onclick = pickColor(colorPickerList[i].value);
-            }
+            const boardButtons = document.getElementsByClassName("boardButton");
 
             const getUsers = (e) => requestUpdate(e, userForm);
             const addUser = (e) => sendPost(e, nameForm);
@@ -134,40 +133,53 @@
     <section id="content">
     </section>
     <section id="board">
-        <div id="boardRow">
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-        </div>
-        <div id="boardRow">
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-        </div>
-        <div id="boardRow">
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-        </div>
-        <div id="boardRow">
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-        </div>
-        <div id="boardRow">
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
-            <button class="boardButton" value="#ffffff"></button>
+        <select id="colorPicker">
+            <option value="#ffffff" selected>White</option>
+            <option value="#ff0000">Red</option>
+            <option value="#ff9933">Orange</option>
+            <option value="#ffff00">Yellow</option>
+            <option value="#00ff00">Green</option>
+            <option value="#00ffff">Cyan</option>
+            <option value="#0000ff">Blue</option>
+            <option value="#ff00ff">Purple</option>
+            <option value="#ffffff">Black</option>
+        </select>
+        <div id="boardCol">
+            <div id="boardRow">
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+            </div>
+            <div id="boardRow">
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+            </div>
+            <div id="boardRow">
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+            </div>
+            <div id="boardRow">
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+            </div>
+            <div id="boardRow">
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+                <button class="boardButton" value="#ffffff"></button>
+            </div>
         </div>
     </section>
     <section id="bottom">

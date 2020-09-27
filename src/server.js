@@ -53,11 +53,13 @@ const urlStruct = {
 
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
+  
+  const params = query.parse(parsedURL.query);
 
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
   } else if (urlStruct[request.method][parsedUrl.pathname]) {
-    urlStruct[request.method][parsedUrl.pathname](request, response);
+    urlStruct[request.method][parsedUrl.pathname](request, response, params);
   } else {
     urlStruct[request.method].notFound(request, response);
   }
