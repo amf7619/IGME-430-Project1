@@ -1,0 +1,19 @@
+{
+  "name": "igme.430-project1",
+  "version": "1.0.0",
+  "description": "The first project for Rich Media II",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amf7619/IGME.430-Project1.git"
+  },
+  "author": "Anthony Ferraioli",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/amf7619/IGME.430-Project1/issues"
+  },
+  "homepage": "https://github.com/amf7619/IGME.430-Project1#readme"
+}
