@@ -9,6 +9,7 @@ const createNewBoard = () => {
       newBoard[i][j] = '#ffffff';
     }
   }
+  return newBoard;
 };
 
 const respondJSON = (request, response, status, object) => {
@@ -93,12 +94,12 @@ const updateBoard = (request, response, body) => {
     message: 'Name and board are both required',
   };
 
-  if (!body.name || !body.board) {
+  if (!body.name || !body.row || !body.col || !body.color) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
-  boards[body.name].board = body.board;
+  boards[body.name].board[body.row][body.col] = body.color;
 
   responseJSON.message = 'Updated successfully';
   return respondJSON(request, response, 204, responseJSON);

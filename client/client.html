@@ -7,7 +7,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
-        const boardButtons = [];
+    
+        const boardWidth = 5;
+        const boardHeight = 5;
+
+        let boardButtons;
+        let colorPicker;
+        let currentBoardName;
         
         const parseJSON = (xhr, content) => {
             if (xhr.response && xhr.getResponseHeader('Content-Type') == 'application/json') {
@@ -22,12 +28,53 @@
                 }
 
                 if(obj.board) {
-                    for(let i = 0; i < obj.board.length; i++) {
-                        boardButtons[i].value = obj.board[i];
-                        boardButtons[i].style.backgroundColor = obj.board[i];
-                    }
+                    drawBoard(obj.board);
+                }
+                else if(obj.names) {
+                    boardListButtons(obj.names);
+                }
+
+                content.innerHTML += `<h3>${currentBoardName}<h3>`;
+            }
+        }
+
+        const drawBoard = (board) => {
+            //document.querySelector("#list").style.display = 'none';
+
+            currentBoardName = board.name;
+            form.querySelector('#nameField').value = currentBoardName;
+
+            for(let i = 0; i < boardHeight; i++) {
+                for(let j = 0; j < boardWidth; j++)
+                {
+                    boardButtons[(i * boardWidth) + j].value = board.board[i][j];
+                    boardButtons[(i * boardWidth) + j].style.backgroundColor = board.board[i][j];
                 }
             }
+        }
+
+        const boardListButtons = (names) => {
+            //document.querySelector("#board").style.display = 'none';
+            let list = document.querySelector("#list");
+
+            list.innerHTML = '';
+
+            for(let i = 0; i < names.length; i++)
+            {
+                let newForm = document.createElement('form');
+                newForm.setAttribute('action', '/getBoard');
+                newForm.setAttribute('method', 'get');
+                let newInput = document.createElement('input');
+                newInput.setAttribute('type', 'submit');
+                newInput.setAttribute('value', names[i]);
+                newForm.appendChild(newInput);
+
+                let findBoard = (e) => requestUpdate(e, newForm, names[i]);
+                newForm.addEventListener('submit', findBoard);
+
+                list.appendChild(newForm);
+            }
+            
         }
 
         const handleResponse = (xhr, parseResponse) => {
@@ -39,6 +86,7 @@
                     break;
                 case 201:
                     content.innerHTML = '<b>Created!</b>';
+                    createNewBoard();
                     break;
                 case 204:
                     content.innerHTML = '<b>Updated (No Content)</b>';
@@ -61,36 +109,40 @@
             const url = form.getAttribute('action');
             const method = form.getAttribute('method');
 
+            console.dir(url);
             const xhr = new XMLHttpRequest();
             xhr.open(method, url);
 
             return xhr;
         }
 
-        const sendPost = (e, nameForm) => {
+        const sendPost = (e, form, row, col) => {
             e.preventDefault();
 
-            const xhr = createXMLRequest(nameForm);
-
-            const nameField = nameForm.querySelector('#nameField');
+            const xhr = createXMLRequest(form);
 
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             xhr.onload = () => handleResponse(xhr);
 
-            const formData = `name=${nameField.value}`;
+            let formData = `name=${currentBoardName}`;
+            if(row !== undefined && col !== undefined) {
+                formData += `&row=${row}&col=${col}&color=${form.value}`;
+            }
             xhr.send(formData);
 
             return false;
         };
 
-        const requestUpdate = (e, userForm) => {
-            const xhr = createXMLRequest(userForm);
+        const requestUpdate = (e, form, optionalName) => {
+            e.preventDefault();
+
+            const xhr = createXMLRequest(form);
 
             xhr.setRequestHeader('Accept', 'application/json');
 
-            if (method === 'get') {
+            if (form.getAttribute('method') === 'get') {
                 xhr.onload = () => handleResponse(xhr, true);
             } else {
                 xhr.onload = () => handleResponse(xhr, false);
@@ -98,20 +150,56 @@
 
             xhr.send();
 
-            e.preventDefault();
             return false;
         };
 
+        const pressBoardButton = (e, row, col) => {
+            let buttonPressed = boardButtons[(row * boardWidth) + col];
+            buttonPressed.style.backgroundColor = colorPicker.value;
+
+            sendPost(e, buttonPressed, row, col);
+        };
+
+        const createNewBoard = () => {
+
+            let boardCol = document.querySelector("#boardCol");
+            boardCol.innerHTML = '';
+
+            for(let i = 0; i < boardHeight; i++)
+            {
+                let boardRow = document.createElement("div");
+                boardRow.setAttribute('id', 'boardRow');
+
+                for(let j = 0; j < boardWidth; j++)
+                {
+                    let newButton = document.createElement("button");
+                    newButton.setAttribute('class', 'boardButton');
+                    newButton.setAttribute('value', '#ffffff');
+                    newButton.setAttribute('action', '/updateBoard');
+                    newButton.setAttribute('method', 'post');
+
+                    let buttonEvent = (e) => pressBoardButton(e, i, j);
+
+                    newButton.addEventListener('click', buttonEvent);
+                    boardRow.appendChild(newButton);
+                }
+                boardCol.appendChild(boardRow);
+            }
+        };
+
         const init = () => {
-            const userForm = document.querySelector('#userForm');
+            const boardForm = document.querySelector('#boardForm');
             const nameForm = document.querySelector('#nameForm');
+            colorPicker = document.querySelector('#colorPicker');
 
-            const boardButtons = document.getElementsByClassName("boardButton");
+            createNewBoard();
 
-            const getUsers = (e) => requestUpdate(e, userForm);
-            const addUser = (e) => sendPost(e, nameForm);
+            boardButtons = document.getElementsByClassName("boardButton");
 
-            userForm.addEventListener('submit', getUsers);
+            const getBoards = (e) => requestUpdate(e, boardForm);
+            const addUser = (e) => { currentBoardName = nameForm.querySelector("#nameField").value; sendPost(e, nameForm);}
+
+            boardForm.addEventListener('submit', getBoards);
             nameForm.addEventListener('submit', addUser);
         };
 
@@ -126,16 +214,19 @@
             <input id="nameField" type="text" name="name" placeholder="Board Name"/>
             <input type="submit" value="Create New Board"/>
         </form>
-        <form id="userForm" action="/getBoardList" method="get">
+        <form id="boardForm" action="/getBoardList" method="get">
             <input type="submit" value="Get All Boards"/>
         </form>
     </section>
     <section id="content">
     </section>
+    <section id="list">
+
+    </section>
     <section id="board">
         <select id="colorPicker">
-            <option value="#ffffff" selected>White</option>
-            <option value="#ff0000">Red</option>
+            <option value="#ffffff">White</option>
+            <option value="#ff0000" selected>Red</option>
             <option value="#ff9933">Orange</option>
             <option value="#ffff00">Yellow</option>
             <option value="#00ff00">Green</option>
@@ -145,54 +236,7 @@
             <option value="#ffffff">Black</option>
         </select>
         <div id="boardCol">
-            <div id="boardRow">
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-            </div>
-            <div id="boardRow">
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-            </div>
-            <div id="boardRow">
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-            </div>
-            <div id="boardRow">
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-            </div>
-            <div id="boardRow">
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-                <button class="boardButton" value="#ffffff"></button>
-            </div>
         </div>
-    </section>
-    <section id="bottom">
-        <h3>Pick a color</h3>
-        <button class="colorPicker" id="whiteButton" value="#ffffff"></button>
-        <button class="colorPicker" id="redButton" value="#ff0000"></button>
-        <button class="colorPicker" id="orangeButton" value="#ff9933"></button>
-        <button class="colorPicker" id="yellowButton" value="#ffff00"></button>
-        <button class="colorPicker" id="greenButton" value="#00ff00"></button>
-        <button class="colorPicker" id="cyanButton" value="#00ffff"></button>
-        <button class="colorPicker" id="blueButton" value="#0000ff"></button>
-        <button class="colorPicker" id="purpleButton" value="#ff00ff"></button>
-        <button class="colorPicker" id="blackButton" value="#000000"></button>
     </section>
 </body>
 
