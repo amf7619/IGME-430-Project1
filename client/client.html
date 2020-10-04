@@ -18,7 +18,6 @@
         const parseJSON = (xhr, content) => {
             if (xhr.response && xhr.getResponseHeader('Content-Type') == 'application/json') {
                 const obj = JSON.parse(xhr.response);
-                console.dir(obj);
 
                 if(obj.message) {
                     content.innerHTML += `<p>Message: ${obj.message}</p>`;
@@ -33,16 +32,15 @@
                 else if(obj.names) {
                     boardListButtons(obj.names);
                 }
-
-                content.innerHTML += `<h3>${currentBoardName}<h3>`;
             }
+
+            document.querySelector("#boardName").innerHTML = currentBoardName;
         }
 
         const drawBoard = (board) => {
-            //document.querySelector("#list").style.display = 'none';
+            document.querySelector("#list").innerHTML = '';
 
             currentBoardName = board.name;
-            form.querySelector('#nameField').value = currentBoardName;
 
             for(let i = 0; i < boardHeight; i++) {
                 for(let j = 0; j < boardWidth; j++)
@@ -54,7 +52,6 @@
         }
 
         const boardListButtons = (names) => {
-            //document.querySelector("#board").style.display = 'none';
             let list = document.querySelector("#list");
 
             list.innerHTML = '';
@@ -67,6 +64,7 @@
                 let newInput = document.createElement('input');
                 newInput.setAttribute('type', 'submit');
                 newInput.setAttribute('value', names[i]);
+                newInput.setAttribute('class', 'boardListButton')
                 newForm.appendChild(newInput);
 
                 let findBoard = (e) => requestUpdate(e, newForm, names[i]);
@@ -105,11 +103,12 @@
             parseJSON(xhr, content);
         }
 
-        const createXMLRequest = (form) => {
-            const url = form.getAttribute('action');
+        const createXMLRequest = (form, query) => {
+            let url = form.getAttribute('action');
+            if(query !== undefined) url += `?${query}`;
+
             const method = form.getAttribute('method');
 
-            console.dir(url);
             const xhr = new XMLHttpRequest();
             xhr.open(method, url);
 
@@ -138,7 +137,7 @@
         const requestUpdate = (e, form, optionalName) => {
             e.preventDefault();
 
-            const xhr = createXMLRequest(form);
+            const xhr = createXMLRequest(form, 'name='+optionalName);
 
             xhr.setRequestHeader('Accept', 'application/json');
 
@@ -156,6 +155,7 @@
         const pressBoardButton = (e, row, col) => {
             let buttonPressed = boardButtons[(row * boardWidth) + col];
             buttonPressed.style.backgroundColor = colorPicker.value;
+            buttonPressed.value = colorPicker.value;
 
             sendPost(e, buttonPressed, row, col);
         };
@@ -192,8 +192,6 @@
             const nameForm = document.querySelector('#nameForm');
             colorPicker = document.querySelector('#colorPicker');
 
-            createNewBoard();
-
             boardButtons = document.getElementsByClassName("boardButton");
 
             const getBoards = (e) => requestUpdate(e, boardForm);
@@ -224,6 +222,7 @@
 
     </section>
     <section id="board">
+        <h3 id="boardName"></h3>
         <select id="colorPicker">
             <option value="#ffffff">White</option>
             <option value="#ff0000" selected>Red</option>
