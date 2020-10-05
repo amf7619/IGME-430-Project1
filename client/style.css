@@ -17,11 +17,6 @@ html, body {
   font-size: 2em;
 }
 
-#content {
-  margin-top: 100px;
-  font-size: 2em;
-}
-
 .boardButton {
   display: inline-block;
   width: 50px;
@@ -32,10 +27,65 @@ html, body {
 }
 
 .boardListButton {
-  width: 75px;
-  height: 25px;
+  width: 20%;
+  height: 40px;
 }
 
 #boardCol {
   padding: 5px;
+}
+
+#colorPicker {
+  display: none;
+  height: 30px;
+  width: 20%;
+}
+
+option :hover {
+  border: 2px black;
+}
+
+#whiteColor {
+  background-color: white;
+  color: white;
+}
+
+#redColor {
+  background-color: red;
+  color: red;
+}
+
+#orangeColor {
+  background-color: #ff9933;
+  color: #ff9933;
+}
+
+#yellowColor {
+  background-color: #ffff00;
+  color: yellow;
+}
+
+#greenColor {
+  background-color: #00ff00;
+  color: #00ff00;
+}
+
+#cyanColor {
+  background-color: #00ffff;
+  color: #00ffff;
+}
+
+#blueColor {
+  background-color: #0000ff;
+  color: #0000ff;
+}
+
+#purpleColor {
+  background-color: #ff00ff;
+  color: #ff00ff;
+}
+
+#blackColor {
+  background-color: #000000;
+  color: #000000;
 }

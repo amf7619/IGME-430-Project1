@@ -26,12 +26,21 @@ const handlePost = (request, response, parsedUrl) => {
 
       jsonHandler.addBoard(request, response, bodyParams);
     });
-  } else if (parsedUrl.pathname === '/updateBoard') {
+  } 
+  else if (parsedUrl.pathname === '/updateBoard') {
     request.on('end', () => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
 
       jsonHandler.updateBoard(request, response, bodyParams);
+    });
+  } 
+  else if (parsedUrl.pathname === '/setBoard') {
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+
+      jsonHandler.setBoard(request, response, bodyParams);
     });
   }
 };

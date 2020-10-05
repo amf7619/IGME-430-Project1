@@ -8,22 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
     
-        const boardWidth = 5;
-        const boardHeight = 5;
+        const boardSize = 10;
 
         let boardButtons;
         let colorPicker;
         let currentBoardName;
         
-        const parseJSON = (xhr, content) => {
+        const parseJSON = (xhr, content, stateMessage) => {
             if (xhr.response && xhr.getResponseHeader('Content-Type') == 'application/json') {
                 const obj = JSON.parse(xhr.response);
 
-                if(obj.message) {
+                if(obj.message && stateMessage) {
                     content.innerHTML += `<p>Message: ${obj.message}</p>`;
-                }
-                else {
-                    content.innerHTML += `<p>${xhr.response}</p>`;
                 }
 
                 if(obj.board) {
@@ -42,11 +38,11 @@
 
             currentBoardName = board.name;
 
-            for(let i = 0; i < boardHeight; i++) {
-                for(let j = 0; j < boardWidth; j++)
+            for(let i = 0; i < boardSize; i++) {
+                for(let j = 0; j < boardSize; j++)
                 {
-                    boardButtons[(i * boardWidth) + j].value = board.board[i][j];
-                    boardButtons[(i * boardWidth) + j].style.backgroundColor = board.board[i][j];
+                    boardButtons[(i * boardSize) + j].value = board.board[i][j];
+                    boardButtons[(i * boardSize) + j].style.backgroundColor = board.board[i][j];
                 }
             }
         }
@@ -78,29 +74,28 @@
         const handleResponse = (xhr, parseResponse) => {
             const content = document.querySelector('#content');
 
+            let stateMessage = false;
             switch (xhr.status) {
                 case 200:
-                    content.innerHTML = '<b>Success!</b>';
                     break;
                 case 201:
-                    content.innerHTML = '<b>Created!</b>';
+                    stateMessage = true;
                     createNewBoard();
                     break;
                 case 204:
-                    content.innerHTML = '<b>Updated (No Content)</b>';
                     break;
                 case 400:
-                    content.innerHTML = '<b>Bad Request</b>';
+                    stateMessage = true;
                     break;
                 case 404:
-                    content.innerHTML = '<b>Resource Not Found</b>';
+                    stateMessage = true;
                     break;
                 default:
                     content.innerHTML = '<p>Error code not implemented by client!</p>'
                     break;
             }
 
-            parseJSON(xhr, content);
+            parseJSON(xhr, content, stateMessage);
         }
 
         const createXMLRequest = (form, query) => {
@@ -153,7 +148,7 @@
         };
 
         const pressBoardButton = (e, row, col) => {
-            let buttonPressed = boardButtons[(row * boardWidth) + col];
+            let buttonPressed = boardButtons[(row * boardSize) + col];
             buttonPressed.style.backgroundColor = colorPicker.value;
             buttonPressed.value = colorPicker.value;
 
@@ -162,15 +157,16 @@
 
         const createNewBoard = () => {
 
+            document.querySelector("#colorPicker").style.display = 'inline-block';
             let boardCol = document.querySelector("#boardCol");
             boardCol.innerHTML = '';
 
-            for(let i = 0; i < boardHeight; i++)
+            for(let i = 0; i < boardSize; i++)
             {
                 let boardRow = document.createElement("div");
                 boardRow.setAttribute('id', 'boardRow');
 
-                for(let j = 0; j < boardWidth; j++)
+                for(let j = 0; j < boardSize; j++)
                 {
                     let newButton = document.createElement("button");
                     newButton.setAttribute('class', 'boardButton');
@@ -187,6 +183,18 @@
             }
         };
 
+        const initialSetup = () => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('post', '/setBoard');
+
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.onload = () => handleResponse(xhr);
+
+            let formData = `size=${boardSize}`;
+            xhr.send(formData);
+        }
+
         const init = () => {
             const boardForm = document.querySelector('#boardForm');
             const nameForm = document.querySelector('#nameForm');
@@ -199,6 +207,8 @@
 
             boardForm.addEventListener('submit', getBoards);
             nameForm.addEventListener('submit', addUser);
+
+            initialSetup();
         };
 
         window.onload = init;
@@ -206,8 +216,8 @@
 </head>
 
 <body>
-    <section id="top">
-        <h3>Color Chart</h3>
+    <section id="infoInput">
+        <h1>Color Chart</h1>
         <form id="nameForm" action="/addBoard" method="post">
             <input id="nameField" type="text" name="name" placeholder="Board Name"/>
             <input type="submit" value="Create New Board"/>
@@ -216,23 +226,25 @@
             <input type="submit" value="Get All Boards"/>
         </form>
     </section>
+
     <section id="content">
     </section>
-    <section id="list">
 
+    <section id="list">
     </section>
+
     <section id="board">
-        <h3 id="boardName"></h3>
+        <h1 id="boardName"></h1>
         <select id="colorPicker">
-            <option value="#ffffff">White</option>
-            <option value="#ff0000" selected>Red</option>
-            <option value="#ff9933">Orange</option>
-            <option value="#ffff00">Yellow</option>
-            <option value="#00ff00">Green</option>
-            <option value="#00ffff">Cyan</option>
-            <option value="#0000ff">Blue</option>
-            <option value="#ff00ff">Purple</option>
-            <option value="#ffffff">Black</option>
+            <option value="#ffffff" id="whiteColor">White</option>
+            <option value="#ff0000" id="redColor" selected>Red</option>
+            <option value="#ff9933" id="orangeColor">Orange</option>
+            <option value="#ffff00" id="yellowColor">Yellow</option>
+            <option value="#00ff00" id="greenColor">Green</option>
+            <option value="#00ffff" id="cyanColor">Cyan</option>
+            <option value="#0000ff" id="blueColor">Blue</option>
+            <option value="#ff00ff" id="purpleColor">Purple</option>
+            <option value="#000000" id="blackColor">Black</option>
         </select>
         <div id="boardCol">
         </div>
