@@ -3,6 +3,7 @@
 
 <head>
     <title>Our simple HTTP server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Patrick+Hand&family=Titillium+Web&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/style.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -19,8 +20,10 @@
                 const obj = JSON.parse(xhr.response);
 
                 if(obj.message && stateMessage) {
-                    content.innerHTML += `<p>Message: ${obj.message}</p>`;
+                    content.innerHTML += `<p>${obj.message}</p>`;
                 }
+
+                document.querySelector("#list").innerHTML = '';
 
                 if(obj.board) {
                     drawBoard(obj.board);
@@ -29,14 +32,12 @@
                     boardListButtons(obj.names);
                 }
             }
-
-            document.querySelector("#boardName").innerHTML = currentBoardName;
         }
 
         const drawBoard = (board) => {
-            document.querySelector("#list").innerHTML = '';
 
             currentBoardName = board.name;
+            document.querySelector("#boardName").innerHTML = currentBoardName;
 
             for(let i = 0; i < boardSize; i++) {
                 for(let j = 0; j < boardSize; j++)
@@ -49,8 +50,6 @@
 
         const boardListButtons = (names) => {
             let list = document.querySelector("#list");
-
-            list.innerHTML = '';
 
             for(let i = 0; i < names.length; i++)
             {
@@ -73,6 +72,7 @@
 
         const handleResponse = (xhr, parseResponse) => {
             const content = document.querySelector('#content');
+            content.innerHTML = '';
 
             let stateMessage = false;
             switch (xhr.status) {
@@ -157,7 +157,8 @@
 
         const createNewBoard = () => {
 
-            document.querySelector("#colorPicker").style.display = 'inline-block';
+            document.querySelector("#boardName").innerHTML = currentBoardName;
+            document.querySelector("#board").style.display = 'block';
             let boardCol = document.querySelector("#boardCol");
             boardCol.innerHTML = '';
 
@@ -195,7 +196,16 @@
             xhr.send(formData);
         }
 
+        const randomBackgroundColor = () => {
+            let colorOptions = ['#a6f5ff', '#fffad4', '#ffe8e6', '#fff4e6', '#f1ffe6', '#f5e3ff'];
+            let index = Math.floor(Math.random() * colorOptions.length);
+
+            document.body.style.backgroundColor = colorOptions[index];
+        }
+
         const init = () => {
+            randomBackgroundColor();
+
             const boardForm = document.querySelector('#boardForm');
             const nameForm = document.querySelector('#nameForm');
             colorPicker = document.querySelector('#colorPicker');
@@ -236,8 +246,8 @@
     <section id="board">
         <h1 id="boardName"></h1>
         <select id="colorPicker">
-            <option value="#ffffff" id="whiteColor">White</option>
-            <option value="#ff0000" id="redColor" selected>Red</option>
+            <option value="#ffffff" id="whiteColor" selected>White</option>
+            <option value="#ff0000" id="redColor">Red</option>
             <option value="#ff9933" id="orangeColor">Orange</option>
             <option value="#ffff00" id="yellowColor">Yellow</option>
             <option value="#00ff00" id="greenColor">Green</option>
@@ -246,7 +256,9 @@
             <option value="#ff00ff" id="purpleColor">Purple</option>
             <option value="#000000" id="blackColor">Black</option>
         </select>
-        <div id="boardCol">
+        <div>
+            <div id="boardCol">
+            </div>
         </div>
     </section>
 </body>
