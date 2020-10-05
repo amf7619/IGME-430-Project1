@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
     
-        const boardSize = 10;
+        const boardSize = 9;
 
         let boardButtons;
         let colorPicker;
@@ -184,18 +184,6 @@
             }
         };
 
-        const initialSetup = () => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('post', '/setBoard');
-
-            xhr.setRequestHeader('Accept', 'application/json');
-
-            xhr.onload = () => handleResponse(xhr);
-
-            let formData = `size=${boardSize}`;
-            xhr.send(formData);
-        }
-
         const randomBackgroundColor = () => {
             let colorOptions = ['#a6f5ff', '#fffad4', '#ffe8e6', '#fff4e6', '#f1ffe6', '#f5e3ff'];
             let index = Math.floor(Math.random() * colorOptions.length);
@@ -217,8 +205,6 @@
 
             boardForm.addEventListener('submit', getBoards);
             nameForm.addEventListener('submit', addUser);
-
-            initialSetup();
         };
 
         window.onload = init;

@@ -1,37 +1,5 @@
-let boards = {};
-let boardSize;
-
-let initialSetup = false;
-
-const initiationCheck = (request, response) => {
-  if(!initialSetup) {
-    let responseJSON = {
-      message: 'Initial setup has not been done for boards. Post a call to /setBoard with dimension of board in order to set up',
-      id: 'missingInitiation',
-    }
-
-    return respondJSON(request, response, 400, responseJSON);
-  }
-}
-
-const setBoard = (request, response, body) => {
-  const responseJSON = {
-    message: 'A proper size value is required to create boards',
-  }
-
-  if(!body.size) {
-    responseJSON.id = 'missingParams';
-    return respondJSON(request, response, 400, responseJSON);
-  }
-
-  boards = {};
-  boardSize = body.size;
-
-  initialSetup = true;
-
-  responseJSON.message = 'Board Size successfully set!';
-  return respondJSON(request, response, 200, responseJSON);
-}
+const boards = {};
+const boardSize = 9;
 
 const createNewBoard = () => {
   const newBoard = new Array(boardSize);
@@ -64,9 +32,6 @@ const respondJSONMeta = (request, response, status) => {
 };
 
 const addBoard = (request, response, body) => {
-
-  initiationCheck(request, response);
-
   const responseJSON = {
     message: 'A unique name for the board is required',
   };
@@ -101,7 +66,6 @@ const getBoardList = (request, response) => {
 const getBoardListMeta = (request, response) => { respondJSONMeta(request, response, 200); };
 
 const getBoard = (request, response, params) => {
-
   const responseJSON = {
     message: 'The name of the board is required to retrieve',
   };
@@ -126,8 +90,6 @@ const getBoard = (request, response, params) => {
 const getBoardMeta = (request, response) => { respondJSONMeta(request, response, 200); };
 
 const updateBoard = (request, response, body) => {
-  initiationCheck(request, response);
-
   const responseJSON = {
     message: 'References to the name of the board, row, col, and color are required to update',
   };
@@ -162,6 +124,5 @@ module.exports = {
   getBoardListMeta,
   notFound,
   notFoundMeta,
-  setBoard,
   updateBoard,
 };
