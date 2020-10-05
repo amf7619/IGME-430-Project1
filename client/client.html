@@ -36,6 +36,9 @@
 
         const drawBoard = (board) => {
 
+            document.querySelector("#board").style.display = 'block';
+            if(document.querySelector("#boardCol").children.length == 0) {createNewBoard();}
+
             currentBoardName = board.name;
             document.querySelector("#boardName").innerHTML = currentBoardName;
 
@@ -153,6 +156,12 @@
             buttonPressed.value = colorPicker.value;
 
             sendPost(e, buttonPressed, row, col);
+
+            let newForm = document.createElement('div');
+            newForm.setAttribute('action', '/getBoard');
+            newForm.setAttribute('method', 'get');
+
+            requestUpdate(e, newForm, currentBoardName);
         };
 
         const createNewBoard = () => {
